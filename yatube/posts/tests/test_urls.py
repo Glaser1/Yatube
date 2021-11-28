@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from posts.models import Post, Group
 from http import HTTPStatus
+from django.core.cache import cache
+
 
 User = get_user_model()
 
@@ -51,6 +53,7 @@ class PostURLTests(TestCase):
         self.authorized_client.force_login(self.user)
         self.author = Client()
         self.author.force_login(self.post_author)
+        cache.clear()
 
     def test_group_url_exist_at_desired_location(self):
         """Страница /group/<slug:slug>/ доступна любому пользователю"""

@@ -264,6 +264,7 @@ class CacheTest(TestCase):
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
     def test_cache_homepage(self):
+        cache.clear()
         response = self.client.get(reverse('posts:index'))
         count = Post.objects.count()
         self.post.delete()
