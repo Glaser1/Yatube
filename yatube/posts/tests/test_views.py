@@ -301,6 +301,7 @@ class FollowingTest(TestCase):
             user=self.user,
             author=self.author).exists()
         )
+        Follow.objects.create(user=self.user, author=self.author)
         only = Follow.objects.filter(
             user=self.user,
             author=self.author
