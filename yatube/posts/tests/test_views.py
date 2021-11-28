@@ -295,18 +295,18 @@ class FollowingTest(TestCase):
         self.assertTrue(Follow.objects.filter(
             user=self.user,
             author=self.author).exists()
-            )
+        )
         self.assertFalse(Follow.objects.filter(
             user=self.user2,
             author=self.author).exists()
-            )
+        )
         Follow.objects.filter(
             user=self.user,
             author=self.author).delete()
         self.assertFalse(Follow.objects.filter(
             user=self.user,
             author=self.author).exists()
-            )
+        )
 
     def test_follower_context(self):
         Follow.objects.create(user=self.user, author=self.author)
