@@ -79,7 +79,7 @@ def post_edit(request, post_id):
         request.POST or None,
         instance=post,
         files=request.FILES or None
-                    )
+    )
     if not form.is_valid():
         print(form.errors)
         return render(request, 'posts/create_post.html',
