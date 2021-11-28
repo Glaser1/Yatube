@@ -307,7 +307,6 @@ class FollowingTest(TestCase):
         )
         self.assertEqual(only.count(), 1)
 
-
     def test_follower_context(self):
         Follow.objects.create(user=self.user, author=self.author)
         response = self.follower_client.get(reverse('posts:follow_index'))
