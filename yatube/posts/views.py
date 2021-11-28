@@ -5,13 +5,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from .forms import PostForm, CommentForm
 from django.conf import settings
-from django.views.decorators.cache import cache_page
 
 
 User = get_user_model()
 
 
-# @cache_page(20, key_prefix='index_page')
+@cache_page(20, key_prefix='index_page')
 def index(request):
     post_list = Post.objects.all()
     paginator = Paginator(post_list, settings.PAGE_COUNT)
@@ -83,7 +82,8 @@ def post_edit(request, post_id):
     if not form.is_valid():
         print(form.errors)
         return render(request, 'posts/create_post.html',
-                      {'form': form, 'is_edit': is_edit, 'post': post})
+                      {'form': form, 'is_edit': is_edit, 'post': post}
+                      )
     form.save()
     return redirect('posts:post_detail', post_id)
 
