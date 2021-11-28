@@ -36,6 +36,7 @@ class PaginatorTestViews(TestCase):
     def setUp(self):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        cache.clear()
 
     def test_first_homepage_contains_ten_records(self):
         response = self.authorized_client.get(reverse('posts:index'))
@@ -127,6 +128,7 @@ class ViewTest(TestCase):
         self.author.force_login(self.author_post)
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        cache.clear()
 
     def test_urls_names_use_correct_templates(self):
         templates = [
@@ -289,6 +291,7 @@ class FollowingTest(TestCase):
         self.follower_client.force_login(self.user)
         self.unfollower_client = Client()
         self.unfollower_client.force_login(self.user2)
+        cache.clear()
 
     def test_user_follows(self):
         Follow.objects.create(user=self.user, author=self.author)
