@@ -301,12 +301,11 @@ class FollowingTest(TestCase):
             user=self.user,
             author=self.author).exists()
         )
-        Follow.objects.create(user=self.user, author=self.author)
         only = Follow.objects.filter(
             user=self.user,
             author=self.author
-        )
-        self.assertEqual(only.count(), 1)
+        ).count()
+        self.assertEqual(only, 1)
 
     def test_follower_context(self):
         Follow.objects.create(user=self.user, author=self.author)
