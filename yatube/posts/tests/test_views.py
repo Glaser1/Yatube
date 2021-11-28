@@ -301,7 +301,7 @@ class FollowingTest(TestCase):
             author=self.author).exists()
                          )
         Follow.objects.filter(
-            user=self.user, 
+            user=self.user,
             author=self.author).delete()
         self.assertFalse(Follow.objects.filter(
             user=self.user,

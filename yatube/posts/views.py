@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from .forms import PostForm, CommentForm
 from django.conf import settings
+from django.views.decorators.cache import cache_page
 
 
 User = get_user_model()
@@ -78,7 +79,7 @@ def post_edit(request, post_id):
         request.POST or None,
         instance=post,
         files=request.FILES or None
-        )
+                    )
     if not form.is_valid():
         print(form.errors)
         return render(request, 'posts/create_post.html',
