@@ -319,7 +319,7 @@ class FollowingTest(TestCase):
         self.assertTrue(Follow.objects.filter(
             user=self.user,
             author=self.author).exists()
-                        )
+        )
         only = Follow.objects.filter(
             user=self.user,
             author=self.author
@@ -330,9 +330,14 @@ class FollowingTest(TestCase):
         self.assertTrue(Follow.objects.filter(
             user=self.user,
             author=self.author).exists()
-                        )
-        Follow.objects.filter(user=self.user, author=self.author).delete()
-        self.assertFalse(Follow.objects.filter(user=self.user, author=self.author).exists())
+        )
+        Follow.objects.filter(
+            user=self.user,
+            author=self.author).delete()
+        self.assertFalse(Follow.objects.filter(
+            user=self.user,
+            author=self.author).exists()
+        )
 
     def test_follower_context(self):
         response = self.follower_client.get(reverse('posts:follow_index'))
