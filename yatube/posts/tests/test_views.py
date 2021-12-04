@@ -144,7 +144,13 @@ class ViewTest(TestCase):
             ['posts:post_edit', 'posts/create_post.html',
              ['post_id', self.post.id]
              ],
-            ['posts:post_create', 'posts/create_post.html']
+            ['posts:post_create', 'posts/create_post.html'],
+            ['about:author', 'about/author.html'],
+            ['about:tech', 'about/tech.html'],
+            ['users:logout', 'users/logged_out.html'],
+            ['users:signup', 'users/signup.html'],
+            ['users:login', 'users/login.html'],
+            ['users:reset', 'users/password_reset_form.html'],
         ]
         for template in templates:
             name = template[0]
@@ -247,6 +253,20 @@ class ViewTest(TestCase):
         )
         self.assertIsNot(response.context['post'].group.pk, self.group_2.pk)
 
+    def test_create_user_shows_correct_context(self):
+        response = self.client.get(reverse('users:signup'))
+        form_fields = {
+            'username': forms.fields.CharField,
+            'first_name': forms.fields.CharField,
+            'last_name': forms.fields.CharField,
+            'password1': forms.fields.CharField,
+            'password2': forms.fields.CharField
+        }
+        for value, expected in form_fields.items():
+            with self.subTest(value=value):
+                form_field = response.context.get('form').fields.get(value)
+                self.assertIsInstance(form_field, expected)
+
 
 class CacheTest(TestCase):
     @classmethod
@@ -286,6 +306,7 @@ class FollowingTest(TestCase):
             text='TestText',
             author=cls.author
         )
+        cls.following = Follow.objects.create(user=cls.user, author=cls.author)
 
     def setUp(self):
         self.follower_client = Client()
@@ -295,20 +316,25 @@ class FollowingTest(TestCase):
         cache.clear()
 
     def test_user_follows(self):
-        Follow.objects.create(user=self.user, author=self.author)
-
         self.assertTrue(Follow.objects.filter(
             user=self.user,
             author=self.author).exists()
-        )
+                        )
         only = Follow.objects.filter(
             user=self.user,
             author=self.author
         ).count()
         self.assertEqual(only, 1)
 
+    def test_user_unfollows(self):
+        self.assertTrue(Follow.objects.filter(
+            user=self.user,
+            author=self.author).exists()
+                        )
+        Follow.objects.filter(user=self.user, author=self.author).delete()
+        self.assertFalse(Follow.objects.filter(user=self.user, author=self.author).exists())
+
     def test_follower_context(self):
-        Follow.objects.create(user=self.user, author=self.author)
         response = self.follower_client.get(reverse('posts:follow_index'))
         before_new_post = len(response.context['page_obj'])
         Post.objects.create(
@@ -320,7 +346,6 @@ class FollowingTest(TestCase):
         self.assertNotEqual(before_new_post, after_new_post)
 
     def test_unfollower_context(self):
-        Follow.objects.create(user=self.user, author=self.author)
         response = self.unfollower_client.get(reverse('posts:follow_index'))
         before_new_post = len(response.context['page_obj'])
         Post.objects.create(

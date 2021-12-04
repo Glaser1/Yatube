@@ -106,27 +106,49 @@ class PostFormTests(TestCase):
             ).exists()
         )
 
-    def test_post_detail(self):
-        post = Post.objects.create(
-            text='TestText',
-            group=self.group1,
-            author=self.user,
-        )
-        comment = Comment.objects.create(
-            text='TestComment',
-            author=self.user,
-            post=post
-        )
+    def test_create_new_user(self):
         form_data = {
-            'comment': comment
+            'username': 'TestUser',
+            'password': 'TestPassword'
         }
-        response = self.authorized_client.post(
-            reverse('posts:add_comment', kwargs={'post_id': post.id}),
+        self.client.post(
+            reverse('users:signup'),
             data=form_data,
             follow=True
         )
-        self.assertRedirects(response,
-                             reverse('posts:post_detail',
-                                     args=(post.id,))
-                             )
-        self.assertTrue(Comment.objects.filter(text='TestComment').exists())
+        self.assertTrue(User.objects.filter(username='TestUser'))
+
+
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+class TestComments(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='TestUser')
+        cls.post = Post.objects.create(
+            text='TestText',
+            author=cls.user,
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
+    def setUp(self):
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
+
+    def test_create_comment(self):
+        form_data = {
+            'post': self.post,
+            'author': self.user,
+            'text': 'TestText'
+        }
+        response = self.authorized_client.post(
+            reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
+            data=form_data,
+            follow=True
+        )
+        self.assertRedirects(response, reverse('posts:post_detail', args=(self.post.id,)))
+        self.assertTrue(Comment.objects.filter(text='TestText').exists())

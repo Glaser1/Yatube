@@ -1,8 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
-from posts.models import Post, Group
+from posts.models import Post, Group, Follow
 from http import HTTPStatus
-from django.core.cache import cache
 
 
 User = get_user_model()
@@ -44,7 +43,10 @@ class PostURLTests(TestCase):
             author=cls.post_author,
             text='Тестовая запись',
             id=0
-
+        )
+        cls.follow = Follow.objects.create(
+            user=cls.post_author,
+            author=cls.user
         )
 
     def setUp(self):
@@ -53,7 +55,6 @@ class PostURLTests(TestCase):
         self.authorized_client.force_login(self.user)
         self.author = Client()
         self.author.force_login(self.post_author)
-        cache.clear()
 
     def test_group_url_exist_at_desired_location(self):
         """Страница /group/<slug:slug>/ доступна любому пользователю"""
@@ -62,7 +63,7 @@ class PostURLTests(TestCase):
 
     def test_profile_url_exist_at_desired_location(self):
         """Страница /profile/<str:username>/ доступна любому пользователю"""
-        response = self.authorized_client.get('/profile/TestUser/')
+        response = self.authorized_client.get('/profile/TestAuthor/')
         self.assertEqual(response.status_code, HTTPStatus.OK.value)
 
     def test_post_detail_url_exist_at_desired_location(self):
@@ -95,14 +96,33 @@ class PostURLTests(TestCase):
         response = self.guest_client.get('/posts/0/edit/', follow=True)
         self.assertRedirects(response, '/auth/login/?next=/posts/0/edit/')
 
+    def test_profile_follow_exists(self):
+        response = self.authorized_client.get('/profile/TestAuthor/follow/')
+        self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
+
+    def test_profile_unfollow_exists(self):
+        response = self.author.get('/profile/TestUser/unfollow/')
+        self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
+
+    def test_follow_url_exists_at_desired_Location(self):
+        response = self.authorized_client.get('/follow/')
+        self.assertEqual(response.status_code, HTTPStatus.OK.value)
+
+    def test_add_comment(self):
+        response = self.authorized_client.get('/posts/0/comment/')
+        self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
+
     def test_url_uses_correct_template(self):
         template_urls = {
             '/': 'posts/index.html',
+            '/about/author/': 'about/author.html',
+            '/about/tech/': 'about/tech.html',
             '/group/test-slug/': 'posts/group_list.html',
-            '/profile/TestUser/': 'posts/profile.html',
+            '/profile/TestAuthor/': 'posts/profile.html',
             '/posts/0/': 'posts/post_detail.html',
             '/posts/0/edit/': 'posts/create_post.html',
-            '/create/': 'posts/create_post.html'
+            '/create/': 'posts/create_post.html',
+            '/follow/': 'posts/follow.html',
         }
 
         for adress, template in template_urls.items():

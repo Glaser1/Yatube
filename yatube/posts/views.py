@@ -3,7 +3,7 @@ from .models import Post, Group, Follow
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
-from .forms import PostForm, CommentForm
+from posts.forms import PostForm, CommentForm
 from django.conf import settings
 from django.views.decorators.cache import cache_page
 
@@ -39,10 +39,9 @@ def profile(request, username):
     paginator = Paginator(posts, settings.PAGE_COUNT)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    following = False
     if request.user.is_authenticated:
         following = Follow.objects.filter(user=request.user, author=user)
-    else:
-        following = False
     context = {
         'username': user, 'page_obj': page_obj, 'following': following,
     }
@@ -64,7 +63,6 @@ def post_create(request):
         return render(request, 'posts/create_post.html', {'form': form})
     form = PostForm(request.POST, files=request.FILES or None)
     if not form.is_valid():
-        print(form.errors)
         return render(request, 'posts/create_post.html', {'form': form})
     new_post = form.save(commit=False)
     new_post.author = request.user
@@ -118,11 +116,7 @@ def follow_index(request):
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
     if request.user != author:
-        if Follow.objects.filter(
-                user=request.user,
-                author=author
-        ).count() != 1:
-            Follow.objects.create(user=request.user, author=author)
+        Follow.objects.get_or_create(user=request.user, author=author)
     return redirect('posts:profile', author)
 
 
