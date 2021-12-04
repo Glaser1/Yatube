@@ -147,11 +147,17 @@ class FollowModelTest(TestCase):
         super().setUpClass()
         cls.follower = User.objects.create_user(username='follower')
         cls.following = User.objects.create_user(username='following')
-        cls.follow = Follow.objects.create(user=cls.follower, author=cls.following)
+        cls.follow = Follow.objects.create(
+            user=cls.follower,
+            author=cls.following
+        )
 
     def test_follow_objects_has_correct_objects_names(self):
         follow = self.follow
-        self.assertEqual(f'{self.follower} подписан на {self.following}', str(follow))
+        self.assertEqual(
+            f'{self.follower} подписан на {self.following}',
+            str(follow)
+        )
 
     def test_follow_verboses(self):
         follow = self.follow
