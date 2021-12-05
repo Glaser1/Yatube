@@ -44,10 +44,6 @@ class PostURLTests(TestCase):
             text='Тестовая запись',
             id=0
         )
-        cls.follow = Follow.objects.create(
-            user=cls.post_author,
-            author=cls.user
-        )
 
     def setUp(self):
         self.guest_client = Client()
@@ -101,6 +97,10 @@ class PostURLTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
 
     def test_profile_unfollow_exists(self):
+        Follow.objects.create(
+            user=self.post_author,
+            author=self.user
+        )
         response = self.author.get('/profile/TestUser/unfollow/')
         self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
 
