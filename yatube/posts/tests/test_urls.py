@@ -122,7 +122,6 @@ class PostURLTests(TestCase):
             '/posts/0/': 'posts/post_detail.html',
             '/posts/0/edit/': 'posts/create_post.html',
             '/create/': 'posts/create_post.html',
-            '/follow/': 'posts/follow.html',
         }
 
         for adress, template in template_urls.items():
