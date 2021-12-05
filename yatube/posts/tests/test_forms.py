@@ -150,5 +150,8 @@ class TestComments(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertRedirects(response, reverse('posts:post_detail', args=(self.post.id,)))
+        self.assertRedirects(
+            response,
+            reverse('posts:post_detail', args=(self.post.id,))
+        )
         self.assertTrue(Comment.objects.filter(text='TestText').exists())
