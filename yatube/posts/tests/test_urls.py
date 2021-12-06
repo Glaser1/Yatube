@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from posts.models import Post, Group, Follow
 from http import HTTPStatus
+from django.core.cache import cache
 
 
 User = get_user_model()
@@ -113,6 +114,7 @@ class PostURLTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
 
     def test_url_uses_correct_template(self):
+        cache.clear()
         template_urls = {
             '/': 'posts/index.html',
             '/about/author/': 'about/author.html',
