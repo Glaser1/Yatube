@@ -82,7 +82,6 @@ def post_edit(request, post_id):
         files=request.FILES or None
     )
     if not form.is_valid():
-        print(form.errors)
         return render(request, 'posts/create_post.html',
                       {'form': form, 'is_edit': is_edit, 'post': post}
                       )
