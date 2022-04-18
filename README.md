@@ -5,7 +5,6 @@
 комментирования записей.
 
 ### Использованные технологии:
- 
  Python 3.7, Django 2.2.16, Pytest, Pillow, sorl-thumbnail
 
 
