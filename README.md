@@ -52,3 +52,7 @@ python manage.py migrate
 ```
 python manage.py runserver
 ```
+
+
+### Документация:
+  Доступна после запуска проекта [здесь](https://127.0.0.1:8000/redoc/)
